@@ -9,6 +9,9 @@ import (
 )
 
 func main() {
+	if len(os.Args) == 1 {
+		log.Fatal("There are no arguments!!!")
+	}
 	pathDir := os.Args[1]
 	files, err := ioutil.ReadDir(pathDir)
 	if err != nil {
@@ -17,10 +20,7 @@ func main() {
 
 	indexFile, err := os.Create("InvertedIndexList.txt")
 	if err != nil {
-		indexFile, err = os.Open("InvertedIndexList.txt")
-		if err != nil {
-			log.Fatal(err)
-		}
+		log.Fatal(err)
 	}
 	defer indexFile.Close()
 
@@ -43,16 +43,16 @@ func getInvertedIndex(pathDir string, files []os.FileInfo) (map[string]string, e
 		if err != nil {
 			return nil, err
 		}
-
-		stringsInFile := strings.Split(string(fileWithStrings), "\r\n")
-		for j := 0; j < len(stringsInFile); j++ {
-			if stringsInFile[j] != "" {
-				value, ok := tokens[stringsInFile[j]]
-				if ok && strconv.Itoa(int(value[len(value)-1])-48) != strconv.Itoa(i+1) {
-					tokens[stringsInFile[j]] = value + "," + strconv.Itoa(i+1)
-				} else if !ok {
-					tokens[stringsInFile[j]] = strconv.Itoa(i + 1)
-				}
+		stringsInFile := strings.Fields(string(fileWithStrings))
+		for j := range stringsInFile {
+			if stringsInFile[j] == "" {
+				continue
+			}
+			value, ok := tokens[stringsInFile[j]]
+			if ok && strconv.Itoa(int(value[len(value)-1])-48) != strconv.Itoa(i+1) {
+				tokens[stringsInFile[j]] = value + "," + strconv.Itoa(i+1)
+			} else if !ok {
+				tokens[stringsInFile[j]] = strconv.Itoa(i + 1)
 			}
 		}
 	}
