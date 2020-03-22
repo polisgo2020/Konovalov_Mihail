@@ -32,6 +32,8 @@ func main() {
 		log.Fatal(err)
 	}
 
+	searchBestStringMatch(tokens)
+
 	_, err = indexFile.WriteString(formOutputString(tokens))
 	if err != nil {
 		log.Fatal(err)
