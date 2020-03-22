@@ -6,7 +6,10 @@ import (
 	"os"
 	"strconv"
 	"strings"
+	"unicode"
 )
+
+type Index map[string][]int
 
 func main() {
 	if len(os.Args) == 1 {
@@ -28,33 +31,73 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	for key, value := range tokens {
-		_, err = indexFile.WriteString(key + ": {" + value + "}\n")
-		if err != nil {
-			log.Fatal(err)
-		}
+
+	_, err = indexFile.WriteString(formOutputString(tokens))
+	if err != nil {
+		log.Fatal(err)
 	}
 }
 
-func getInvertedIndex(pathDir string, files []os.FileInfo) (map[string]string, error) {
-	tokens := map[string]string{}
-	for i, file := range files {
+func getInvertedIndex(pathDir string, files []os.FileInfo) (map[string]Index, error) {
+	tokens := map[string]Index{}
+	for _, file := range files {
 		fileWithStrings, err := ioutil.ReadFile(pathDir + "/" + file.Name())
 		if err != nil {
 			return nil, err
 		}
 		stringsInFile := strings.Fields(string(fileWithStrings))
-		for j := range stringsInFile {
-			if stringsInFile[j] == "" {
+		for j, stringInFile := range stringsInFile {
+			stringInFile = trueStringForInvertedIndex(stringInFile)
+			if stringInFile == "" {
 				continue
 			}
-			value, ok := tokens[stringsInFile[j]]
-			if ok && strconv.Itoa(int(value[len(value)-1])-48) != strconv.Itoa(i+1) {
-				tokens[stringsInFile[j]] = value + "," + strconv.Itoa(i+1)
+			tokensInFiles, ok := tokens[stringInFile]
+			if ok {
+				positionInFile := tokensInFiles[file.Name()]
+				positionInFile = append(positionInFile, j+1)
+				tokensInFiles[file.Name()] = positionInFile
 			} else if !ok {
-				tokens[stringsInFile[j]] = strconv.Itoa(i + 1)
+				tokensInFiles = Index{}
+				tokensInFiles[file.Name()] = []int{j + 1}
+				tokens[stringInFile] = tokensInFiles
 			}
 		}
 	}
 	return tokens, nil
+}
+
+func trueStringForInvertedIndex(stringInFile string) string {
+	stringInFile = strings.TrimFunc(stringInFile, func(r rune) bool {
+		return !unicode.IsLetter(r)
+	})
+
+	return strings.ToLower(stringInFile)
+}
+
+func formOutputString(tokens map[string]Index) string {
+	var outputString string
+	for token, value := range tokens {
+		outputString += token + ": "
+		var i = 0
+
+		for fileName, positions := range value {
+			outputString += fileName + "{"
+
+			for i, position := range positions {
+				if i == len(positions)-1 {
+					outputString += strconv.Itoa(position) + "}"
+				} else {
+					outputString += strconv.Itoa(position) + ", "
+				}
+			}
+
+			if i == len(value)-1 {
+				outputString += "\n"
+			} else {
+				outputString += " | "
+			}
+			i++
+		}
+	}
+	return outputString
 }
