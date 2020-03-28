@@ -1,4 +1,4 @@
-package main
+package invertedIndex
 
 import (
 	"fmt"
@@ -7,7 +7,7 @@ import (
 	"strconv"
 )
 
-func searchBestStringMatch(tokens map[string]Index) {
+func SearchBestStringMatch(tokens map[string]Index) {
 	userStrings := os.Args[2:]
 	if len(userStrings) == 0 {
 		return

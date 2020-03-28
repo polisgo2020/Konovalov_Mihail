@@ -1,8 +1,7 @@
-package main
+package invertedIndex
 
 import (
 	"io/ioutil"
-	"log"
 	"os"
 	"strconv"
 	"strings"
@@ -11,36 +10,7 @@ import (
 
 type Index map[string][]int
 
-func main() {
-	if len(os.Args) == 1 {
-		log.Fatal("There are no arguments!!!")
-	}
-	pathDir := os.Args[1]
-	files, err := ioutil.ReadDir(pathDir)
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	indexFile, err := os.Create("InvertedIndexList.txt")
-	if err != nil {
-		log.Fatal(err)
-	}
-	defer indexFile.Close()
-
-	tokens, err := getInvertedIndex(pathDir, files)
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	searchBestStringMatch(tokens)
-
-	_, err = indexFile.WriteString(formOutputString(tokens))
-	if err != nil {
-		log.Fatal(err)
-	}
-}
-
-func getInvertedIndex(pathDir string, files []os.FileInfo) (map[string]Index, error) {
+func GetInvertedIndex(pathDir string, files []os.FileInfo) (map[string]Index, error) {
 	tokens := map[string]Index{}
 	for _, file := range files {
 		fileWithStrings, err := ioutil.ReadFile(pathDir + "/" + file.Name())
@@ -76,7 +46,7 @@ func trueStringForInvertedIndex(stringInFile string) string {
 	return strings.ToLower(stringInFile)
 }
 
-func formOutputString(tokens map[string]Index) string {
+func FormOutputString(tokens map[string]Index) string {
 	var outputString string
 	for token, value := range tokens {
 		outputString += token + ": "
