@@ -22,8 +22,9 @@ func main() {
 		log.Fatal(err)
 	}
 	defer indexFile.Close()
+	tokens := map[string]invertedIndex.Index{}
 
-	tokens, err := invertedIndex.GetInvertedIndex(pathDir, files)
+	tokens, err = invertedIndex.GetInvertedIndex(pathDir, files)
 	if err != nil {
 		log.Fatal(err)
 	}
