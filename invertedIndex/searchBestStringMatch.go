@@ -7,6 +7,7 @@ import (
 	"strconv"
 )
 
+//Func search best string match looking for the file with the most tokens and print them in decreasing order
 func SearchBestStringMatch(tokens map[string]Index) {
 	userStrings := os.Args[2:]
 	if len(userStrings) == 0 {
