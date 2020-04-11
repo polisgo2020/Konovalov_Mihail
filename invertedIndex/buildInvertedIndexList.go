@@ -13,7 +13,7 @@ import (
 type Index map[string][]int
 
 //Function create the inverted index struct were you have token then files were token located and position in files
-func GetInvertedIndex(pathDir string, files []os.FileInfo) (map[string]Index, error) {
+func GetInvertedIndex(pathDir string, files []os.FileInfo) map[string]Index {
 	m := make(chan map[string]Index)
 	wg := &sync.WaitGroup{}
 	for _, file := range files {
@@ -38,7 +38,7 @@ func GetInvertedIndex(pathDir string, files []os.FileInfo) (map[string]Index, er
 		}
 
 	}
-	return tokensFilePosition, nil
+	return tokensFilePosition
 }
 
 func readFile(outputChan chan<- map[string]Index, wg *sync.WaitGroup,
