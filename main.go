@@ -27,6 +27,9 @@ func main() {
 		return
 	}
 	if os.Args[1] == "search" {
+		if len(os.Args[3:]) == 0 {
+			return
+		}
 		searchProgram(os.Args[2], os.Args[3:])
 		return
 	}

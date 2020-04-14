@@ -102,7 +102,7 @@ func FormOutputString(tokens map[string]Index) string {
 				if i == len(positions)-1 {
 					outputString += strconv.Itoa(position) + "}"
 				} else {
-					outputString += strconv.Itoa(position) + ", "
+					outputString += strconv.Itoa(position) + ","
 				}
 			}
 
