@@ -44,23 +44,28 @@ func GetInvertedIndex(pathDir string, files []os.FileInfo) map[string]Index {
 func readFile(outputChan chan<- map[string]Index, wg *sync.WaitGroup,
 	pathDir string, fileName string) {
 	defer wg.Done()
-	fileWithStrings, err := ioutil.ReadFile(pathDir + "/" + fileName)
-	if err != nil {
-		log.Fatal(err)
-	}
+	if len(pathDir) != 0 {
+		fileWithStrings, err := ioutil.ReadFile(pathDir + "/" + fileName)
+		if err != nil {
+			log.Fatal(err)
+		}
+		tokens := makeMapForIndex(strings.Fields(string(fileWithStrings)), fileName)
 
-	tokens, err := makeMapForIndex(strings.Fields(string(fileWithStrings)), fileName)
-
-	if err != nil {
-		log.Fatal(err)
+		outputChan <- tokens
 	} else {
+		fileWithStrings, err := ioutil.ReadFile(fileName)
+		if err != nil {
+			log.Fatal(err)
+		}
+		tokens := makeMapForIndex(strings.Fields(string(fileWithStrings)), fileName)
+
 		outputChan <- tokens
 	}
 
 	return
 }
 
-func makeMapForIndex(fileWithString []string, fileName string) (map[string]Index, error) {
+func makeMapForIndex(fileWithString []string, fileName string) map[string]Index {
 	tokens := map[string]Index{}
 	for i, stringInFile := range fileWithString {
 		stringInFile = trueStringForInvertedIndex(stringInFile)
@@ -78,7 +83,7 @@ func makeMapForIndex(fileWithString []string, fileName string) (map[string]Index
 			tokens[stringInFile] = tokensInFiles
 		}
 	}
-	return tokens, nil
+	return tokens
 }
 
 func trueStringForInvertedIndex(stringInFile string) string {

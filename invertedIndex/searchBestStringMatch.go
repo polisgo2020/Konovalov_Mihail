@@ -11,7 +11,7 @@ import (
 )
 
 //Func search best string match looking for the file with the most tokens and print them in decreasing order
-func SearchBestStringMatch(fileWithIndexPath string, userStrings []string) {
+func SearchBestStringMatch(fileWithIndexPath string, userStrings []string) []string {
 	tokens := readFileWithInvertedIndex(fileWithIndexPath)
 	userStringsForInvertedIndex := makeStringsForInvertedIndex(userStrings)
 
@@ -50,10 +50,13 @@ func SearchBestStringMatch(fileWithIndexPath string, userStrings []string) {
 	sort.Slice(fileWithPriority, func(i, j int) bool {
 		return fileWithPriority[i].numberWords > fileWithPriority[j].numberWords
 	})
-
+	arrayWithFilesPriority := []string{}
 	for _, filePriority := range fileWithPriority {
+		arrayWithFilesPriority = append(arrayWithFilesPriority, filePriority.fileName+"{"+
+			strconv.Itoa(filePriority.numberWords)+"}")
 		fmt.Println(filePriority.fileName + "{" + strconv.Itoa(filePriority.numberWords) + "}")
 	}
+	return arrayWithFilesPriority
 }
 
 func readFileWithInvertedIndex(filePath string) map[string]Index {
